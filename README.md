@@ -92,3 +92,17 @@ We encourage you to report issues and contribute changes
 ## License
 
 DDE session shell is licensed under **GPL-3.0-or-later**.
+
+---
+
+## Download
+
+Pre-built `.deb` packages are available on the [Releases](https://github.com/K4RLT/dde-session-shell-repack/releases/latest) page.
+
+Download and install the main package:
+
+```bash
+sudo dpkg -i dde-session-shell_6.0.57_amd64.deb
+```
+
+> **Note:** The `dbgsym` and `dev` packages are optional debug/development packages. Most users only need `dde-session-shell_6.0.57_amd64.deb`.
