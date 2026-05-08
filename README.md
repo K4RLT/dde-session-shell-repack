@@ -96,7 +96,8 @@ DDE session shell is licensed under **GPL-3.0-or-later**.
 ---
 
 ## Download
-https://raw.githubusercontent.com/K4RLT/dde-session-shell-repack/main/WhatTo.png
+![Repack lock screen](https://raw.githubusercontent.com/K4RLT/dde-session-shell-repack/main/WhatTo.png)
+
 Pre-built `.deb` packages are available on the [Releases](https://github.com/K4RLT/dde-session-shell-repack/releases/latest) page.
 
 Download and install the main package:
