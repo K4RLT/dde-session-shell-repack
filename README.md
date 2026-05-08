@@ -86,3 +86,12 @@ We encourage you to report issues and contribute changes
 ## License
 
 DDE session shell is licensed under **GPL-3.0-or-later**.
+
+---
+
+## Screenshots
+
+| Default (Upstream) | Repack |
+|---|---|
+| ![Default lock screen](https://raw.githubusercontent.com/K4RLT/dde-session-shell-repack/main/image.png) | ![Repack lock screen](https://raw.githubusercontent.com/K4RLT/dde-session-shell-repack/main/Untitled.jpeg) |
+
