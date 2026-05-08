@@ -21,7 +21,7 @@ This is a repackaged fork with custom lock screen UI changes for Deepin 25.
 
 | Default (Upstream) | Repack |
 |---|---|
-| ![Default lock screen](https://raw.githubusercontent.com/K4RLT/dde-session-shell-repack/main/image.png) | ![Repack lock screen](https://raw.githubusercontent.com/K4RLT/dde-session-shell-repack/main/Untitled.jpeg) |
+| ![Default lock screen](https://raw.githubusercontent.com/K4RLT/dde-session-shell-repack/main/image.png) | ![Repack lock screen](https://raw.githubusercontent.com/K4RLT/dde-session-shell-repack/main/After.jpeg) |
 
 ---
 
