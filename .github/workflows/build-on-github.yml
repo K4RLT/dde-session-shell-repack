@@ -19,6 +19,15 @@ jobs:
             apt-get update
             apt-get install -y --no-install-recommends ca-certificates gnupg apt-transport-https curl build-essential cmake dpkg-dev git
             echo "deb [trusted=yes] https://community-packages.deepin.com/beige crimson main" > /etc/apt/sources.list.d/deepin.list
+            cat > /etc/apt/preferences.d/99-prefer-debian << "PIN"
+            Package: *
+            Pin: release o=Debian
+            Pin-Priority: 900
+
+            Package: *
+            Pin: origin community-packages.deepin.com
+            Pin-Priority: 100
+            PIN
             apt-get update
             apt-get build-dep -y .
             mkdir -p build && cd build
