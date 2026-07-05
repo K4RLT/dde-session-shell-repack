@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,12 +26,20 @@ jobs:
             apt-get update
             apt-get build-dep -y .
             mkdir -p build && cd build
-            cmake ..
+            cmake -DCMAKE_BUILD_TYPE=Release ..
             make -j$(nproc)
+            find . -maxdepth 1 -type f -executable -exec strip --strip-unneeded {} \; || true
           '
 
-      - name: Upload build output
-        uses: actions/upload-artifact@v4
+      - name: Package build output
+        run: |
+          cd build
+          tar -czf ../dde-session-shell-build.tar.gz .
+
+      - name: Create beta release
+        uses: softprops/action-gh-release@v2
         with:
-          name: dde-session-shell-build
-          path: build/
+          tag_name: beta-${{ github.run_number }}
+          name: Beta build ${{ github.run_number }}
+          prerelease: true
+          files: dde-session-shell-build.tar.gz
