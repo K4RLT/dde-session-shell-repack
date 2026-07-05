@@ -101,7 +101,7 @@ void AuthPassword::initUI()
 #else
     m_lineEdit->lineEdit()->setValidator(new QRegExpValidator(QRegExp("^[ -~]+$")));
 #endif
-    DFontSizeManager::instance()->bind(m_lineEdit, DFontSizeManager::T6);
+    DFontSizeManager::instance()->bind(m_lineEdit, DFontSizeManager::T6, QFont::Medium);
 
     setLineEditInfo(tr("Password"), PlaceHolderText);
 

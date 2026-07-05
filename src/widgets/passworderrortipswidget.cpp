@@ -46,7 +46,7 @@ void PasswordErrorTipsWidget::initUi()
     hlay->setContentsMargins(0, 0, 0, 0);
     hlay->setSpacing(5);
     hlay->addWidget(m_tipLabel, 0, Qt::AlignmentFlag::AlignLeft | Qt::AlignmentFlag::AlignTop);
-    DFontSizeManager::instance()->bind(m_tipLabel, DFontSizeManager::T6);
+    DFontSizeManager::instance()->bind(m_tipLabel, DFontSizeManager::T6, QFont::Medium);
     m_tipLabel->setForegroundRole(DPalette::TextWarning);
 
     QPixmap pixmap;
@@ -58,17 +58,14 @@ void PasswordErrorTipsWidget::initUi()
     mainLay->addWidget(m_tipsWidget, 0, Qt::AlignmentFlag::AlignTop | Qt::AlignmentFlag::AlignLeft);
 
     m_detailTextEdit->hide();
-    QFont detailFont;
-    detailFont.setFamily("Noto Sans CJK SC-Thin");
-    detailFont.setWeight(QFont::ExtraLight);
     QPalette palette = m_detailTextEdit->palette();
     palette.setColor(QPalette::WindowText, Qt::black);
     m_detailTextEdit->setPalette(palette);
 
-    DFontSizeManager::instance()->bind(m_detailTextEdit, DFontSizeManager::T6);
+    // 使用系统默认字体，字重为 Medium，不再写死为 "Noto Sans CJK SC-Thin"
+    DFontSizeManager::instance()->bind(m_detailTextEdit, DFontSizeManager::T6, QFont::Medium);
     m_detailTextEdit->setAttribute(Qt::WA_TranslucentBackground, false);
     m_detailTextEdit->setFixedWidth(MaxWidth);
-    m_detailTextEdit->setFont(detailFont);
     m_detailTextEdit->setFrameShape(QFrame::Shape::NoFrame);
     m_detailTextEdit->setReadOnly(true);
     m_detailTextEdit->setTextInteractionFlags(Qt::NoTextInteraction);

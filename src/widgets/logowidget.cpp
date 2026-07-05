@@ -70,10 +70,10 @@ void LogoWidget::initUI()
     m_logoVersionLabel->setPalette(pe);
 #endif
     //由于有些字体不支持一些语言，会造成切换语言后登录界面和锁屏界面版本信息大小不一致
-    //设置版本信息的默认字体为系统的默认字体以便于支持更多语言
+    //版本信息使用系统的默认字体家族（不再写死为 "Sans Serif"），字重使用 Medium
     QFont font(m_logoVersionLabel->font());
-    font.setFamily("Sans Serif");
     font.setPixelSize(m_logoLabel->height() / 2);
+    font.setWeight(QFont::Medium);
     m_logoVersionLabel->setFont(font);
 
     if(DSysInfo::UosEdition::UosEducation == DSysInfo::uosEditionType()) {  //教育版登录界面不要显示系统版本号（和Logo冲突）

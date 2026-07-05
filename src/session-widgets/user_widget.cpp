@@ -89,7 +89,7 @@ void UserWidget::initUI()
     m_displayNameLabel->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Fixed);
     m_displayNameLabel->setFixedHeight(UserDisplayNameHeight);
     m_displayNameLabel->setText(m_user->displayName());
-    DFontSizeManager::instance()->bind(m_displayNameLabel, DFontSizeManager::T2);
+    DFontSizeManager::instance()->bind(m_displayNameLabel, DFontSizeManager::T2, QFont::Medium);
     QPalette palette = m_displayNameLabel->palette();
     palette.setColor(QPalette::WindowText, Qt::white);
     m_displayNameLabel->setPalette(palette);

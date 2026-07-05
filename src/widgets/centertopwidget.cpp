@@ -50,7 +50,7 @@ void CenterTopWidget::initUi()
     bool ok;
     int fontSize = DConfigHelper::instance()->getConfig(TOP_TIP_TEXT_FONT, 5).toInt(&ok);
     if (!ok || fontSize < 0 || fontSize > 9) fontSize = DFontSizeManager::T6;
-    DFontSizeManager::instance()->bind(m_topTip, static_cast<DFontSizeManager::SizeType>(fontSize));
+    DFontSizeManager::instance()->bind(m_topTip, static_cast<DFontSizeManager::SizeType>(fontSize), QFont::Medium);
 
     layout->addSpacerItem(m_topTipSpacer);
     layout->addWidget(m_topTip);
@@ -172,7 +172,7 @@ void CenterTopWidget::onDConfigPropertyChanged(const QString &key, const QVarian
         bool ok;
         const int fontSize = value.toInt(&ok);
         if (ok && fontSize > 0 && fontSize < 9)
-            DFontSizeManager::instance()->bind(obj->m_topTip, static_cast<DFontSizeManager::SizeType>(fontSize));
+            DFontSizeManager::instance()->bind(obj->m_topTip, static_cast<DFontSizeManager::SizeType>(fontSize), QFont::Medium);
         else
             qCWarning(DDE_SHELL) << "Top tip text font format error, font size: " << fontSize;
     }

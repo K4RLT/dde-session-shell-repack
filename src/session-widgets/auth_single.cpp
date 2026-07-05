@@ -8,6 +8,7 @@
 #include "dlineeditex.h"
 #include "dbusconstant.h"
 
+#include <DFontSizeManager>
 #include <DHiDPIHelper>
 #include <DDialogCloseButton>
 
@@ -65,6 +66,8 @@ void AuthSingle::initUI()
 #else
     m_lineEdit->lineEdit()->setValidator(new QRegExpValidator(QRegExp("^[ -~]+$"), this));
 #endif
+    // 密码输入框使用系统字体，字重为 Medium
+    DFontSizeManager::instance()->bind(m_lineEdit, DFontSizeManager::T6, QFont::Medium);
 
     auto *passwordLayout = new QHBoxLayout(m_lineEdit->lineEdit());
     passwordLayout->setContentsMargins(0, 0, 10, 0);

@@ -1,0 +1,31 @@
+{
+	"BUILD_DIR" : "/home/Yiran/dde-session-shell-repack-main/build/lightdm-deepin-greeter_autogen",
+	"CMAKE_BINARY_DIR" : "/home/Yiran/dde-session-shell-repack-main/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/Yiran/dde-session-shell-repack-main/build",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/Yiran/dde-session-shell-repack-main",
+	"CMAKE_SOURCE_DIR" : "/home/Yiran/dde-session-shell-repack-main",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Unix Makefiles",
+	"INCLUDE_DIR" : "/home/Yiran/dde-session-shell-repack-main/build/lightdm-deepin-greeter_autogen/include",
+	"INPUTS" : 
+	[
+		"/home/Yiran/dde-session-shell-repack-main/src/widgets/skin/layoutbutton.qss",
+		"/home/Yiran/dde-session-shell-repack-main/src/widgets/skin/validate-policy.conf",
+		"/home/Yiran/dde-session-shell-repack-main/src/widgets/skin/login.qss",
+		"/home/Yiran/dde-session-shell-repack-main/src/widgets/skin/keybdlayoutwidget.qss",
+		"/home/Yiran/dde-session-shell-repack-main/src/widgets/skin/mediawidget.qss",
+		"/home/Yiran/dde-session-shell-repack-main/src/widgets/skin/requireshutdown.qss",
+		"/home/Yiran/dde-session-shell-repack-main/src/widgets/skin/passwdedit.qss"
+	],
+	"LOCK_FILE" : "/home/Yiran/dde-session-shell-repack-main/build/CMakeFiles/lightdm-deepin-greeter_autogen.dir/AutoRcc_widgetstheme_RZ4CM6YYJ6_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "widgetstheme" ],
+	"OUTPUT_CHECKSUM" : "RZ4CM6YYJ6",
+	"OUTPUT_NAME" : "qrc_widgetstheme.cpp",
+	"RCC_EXECUTABLE" : "/usr/lib/qt6/libexec/rcc",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "/home/Yiran/dde-session-shell-repack-main/build/CMakeFiles/lightdm-deepin-greeter_autogen.dir/AutoRcc_widgetstheme_RZ4CM6YYJ6_Used.txt",
+	"SOURCE" : "/home/Yiran/dde-session-shell-repack-main/src/widgets/widgetstheme.qrc",
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}

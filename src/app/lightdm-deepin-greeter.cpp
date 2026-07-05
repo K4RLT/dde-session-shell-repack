@@ -50,12 +50,13 @@ int main(int argc, char* argv[])
 
     DGuiApplicationHelper::setAttribute(DGuiApplicationHelper::UseInactiveColorGroup, false);
 
-    // 以下4行为解决登录和锁屏的默认字体不一致的情况，gsettings默认值为10.5，
+    // 以下几行为解决登录和锁屏的默认字体不一致的情况，gsettings默认值为10.5，
     // 而登录读取不到gsettings配置的默认值而使用Qt默认的9，导致登录界面字体很小。
     // bug:161915
-    QFont font;
+    // 不再强制指定字体家族（原先写死为 "Noto Sans CJK SC-Thin"），
+    // 保留原有字体家族以跟随系统字体设置，只修正字号问题。
+    QFont font = QGuiApplication::font();
     font.setPointSize(10.5);
-    font.setFamily("Noto Sans CJK SC-Thin");
     qGuiApp->setFont(font);
 
     DApplication a(argc, argv);

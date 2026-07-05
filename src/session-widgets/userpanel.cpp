@@ -30,11 +30,11 @@ void UserPanel::initUI()
 {
     setRadius(18);
     m_displayNameLabel->setAlignment(Qt::AlignLeft);
-    DFontSizeManager::instance()->bind(m_displayNameLabel, DFontSizeManager::T5);
+    DFontSizeManager::instance()->bind(m_displayNameLabel, DFontSizeManager::T5, QFont::Medium);
     m_displayNameLabel->setElideMode(Qt::ElideRight);
 
     m_typeLabel->setAlignment(Qt::AlignLeft);
-    DFontSizeManager::instance()->bind(m_typeLabel, DFontSizeManager::T6);
+    DFontSizeManager::instance()->bind(m_typeLabel, DFontSizeManager::T6, QFont::Medium);
     m_typeLabel->setElideMode(Qt::ElideRight);
 
     m_avatar->setAvatarSize(UserAvatarSize);

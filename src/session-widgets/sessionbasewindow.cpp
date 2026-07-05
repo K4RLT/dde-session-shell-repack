@@ -145,6 +145,9 @@ void SessionBaseWindow::initUI()
     m_centerVLayout->setMargin(0);
 #endif
     m_centerVLayout->setSpacing(0);
+    // 在内容前面加一段可伸缩空间，将用户登录区域（头像+认证控件）
+    // 挤压到中间区域的底部，靠近底部图标栏，而不是紧贴顶部时钟。
+    m_centerVLayout->addStretch(1);
     m_centerVLayout->addSpacerItem(m_centerSpacerItem);
     m_centerVLayout->addLayout(m_centerLayout);
 

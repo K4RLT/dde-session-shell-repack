@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QDateTime>
 #include <QFontDatabase>
+#include <QGuiApplication>
 
 const QStringList weekdayFormat = {"dddd", "ddd"};
 const QStringList shortDateFormat = { "yyyy/M/d", "yyyy-M-d", "yyyy.M.d",
@@ -15,6 +16,27 @@ const QStringList shortDateFormat = { "yyyy/M/d", "yyyy-M-d", "yyyy.M.d",
                                       "yy-M-d", "yy.M.d" };
 const QStringList shortTimeFormat = { "h:mm", "hh:mm"};
 
+/**
+ * @brief resolveHeavyWeight 检测系统字体是否提供 Black/Heavy 字重，
+ * 如果没有则依次降级到 ExtraBold、Bold，保证在任意系统字体下都有明显的"重"字重效果。
+ */
+static QFont::Weight resolveHeavyWeight(const QString &family)
+{
+    const QStringList styles = QFontDatabase::styles(family);
+    for (const QString &style : styles) {
+        if (style.contains(QStringLiteral("Black"), Qt::CaseInsensitive) ||
+            style.contains(QStringLiteral("Heavy"), Qt::CaseInsensitive)) {
+            return QFont::Black;
+        }
+    }
+    for (const QString &style : styles) {
+        if (style.contains(QStringLiteral("ExtraBold"), Qt::CaseInsensitive)) {
+            return QFont::ExtraBold;
+        }
+    }
+    return QFont::Bold;
+}
+
 TimeWidget::TimeWidget(QWidget *parent)
     : QWidget(parent)
     , m_timeLabel(nullptr)
@@ -22,24 +44,25 @@ TimeWidget::TimeWidget(QWidget *parent)
     , m_refreshTimer(nullptr)
     , m_use24HourFormat(true)
 {
-    QFont timeFont;
-    timeFont.setFamily("Noto Sans CJK SC-Thin");
-
-    m_timeLabel = new QLabel;
-    timeFont.setWeight(QFont::ExtraLight);
-    m_timeLabel->setFont(timeFont);
-    m_timeLabel->setAlignment(Qt::AlignCenter);
-    QPalette palette = m_timeLabel->palette();
-    palette.setColor(QPalette::WindowText, Qt::white);
-    m_timeLabel->setPalette(palette);
-    DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T1);
+    // 不再强制指定字体家族，交由系统默认字体渲染，保证跟随系统字体设置
+    const QString systemFontFamily = QGuiApplication::font().family();
+    const QFont::Weight heavyWeight = resolveHeavyWeight(systemFontFamily);
 
     m_dateLabel = new QLabel;
     m_dateLabel->setAlignment(Qt::AlignCenter);
-    palette = m_dateLabel->palette();
+    QPalette palette = m_dateLabel->palette();
     palette.setColor(QPalette::WindowText, Qt::white);
     m_dateLabel->setPalette(palette);
-    DFontSizeManager::instance()->bind(m_dateLabel, DFontSizeManager::T6);
+    // 日期使用半粗体（Semibold/DemiBold）
+    DFontSizeManager::instance()->bind(m_dateLabel, DFontSizeManager::T6, QFont::DemiBold);
+
+    m_timeLabel = new QLabel;
+    m_timeLabel->setAlignment(Qt::AlignCenter);
+    palette = m_timeLabel->palette();
+    palette.setColor(QPalette::WindowText, Qt::white);
+    m_timeLabel->setPalette(palette);
+    // 时钟使用系统字体的最重字重（Heavy/Black，若系统字体不提供则依次降级）
+    DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T1, heavyWeight);
 
     refreshTime();
 
@@ -47,9 +70,10 @@ TimeWidget::TimeWidget(QWidget *parent)
     m_refreshTimer->setInterval(1000);
     m_refreshTimer->start();
 
+    // 日期显示在时钟上方
     QVBoxLayout *vLayout = new QVBoxLayout;
-    vLayout->addWidget(m_timeLabel);
     vLayout->addWidget(m_dateLabel);
+    vLayout->addWidget(m_timeLabel);
     vLayout->setSpacing(0);
     vLayout->setContentsMargins(0, 0, 0, 0);
 
