@@ -13,3 +13,4 @@ debian/files
 # Qt MOC / generated
 *_autogen/
 debian/.debhelper/
+build/
