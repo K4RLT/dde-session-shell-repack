@@ -1,0 +1,178 @@
+diff -ru '--exclude=.git' orig/src/global_util/constants.h dde-session-shell-repack-main/src/global_util/constants.h
+--- orig/src/global_util/constants.h	2026-07-05 09:31:29.931552843 +0000
++++ dde-session-shell-repack-main/src/global_util/constants.h	2026-07-05 09:33:29.988751113 +0000
+@@ -26,7 +26,8 @@
+ static const int CHOOSE_AUTH_TYPE_PLACE_HOLDER_HEIGHT = 36; // 认证类型选择按钮占位高度
+ static const int BIO_AUTH_STATE_BOTTOM_SPACING = 30; // 生物识别状态底部间隔
+ static const int CHOOSE_AUTH_TYPE_BUTTON_BOTTOM_SPACING = 40; // 认证类型选择按钮底部间隔
+-static const double AUTH_WIDGET_TOP_SPACING_PERCENT = 0.35; // 认证窗口顶部间隔占整个屏幕的百分比
++static const double AUTH_WIDGET_TOP_SPACING_PERCENT = 0.20; // 认证窗口顶部间隔占整个屏幕的百分比（调小以让认证区域更靠近底部，参考 macOS 锁屏布局）
++static const int AUTH_WIDGET_BOTTOM_SPACING = 40; // 认证区域与底部图标栏之间的固定间距，避免贴边
+ static const int LAYOUT_BUTTON_HEIGHT =  34;
+ static const int KEYBOARD_LAYOUT_WIDTH = 200;
+ 
+diff -ru '--exclude=.git' orig/src/session-widgets/sessionbasewindow.cpp dde-session-shell-repack-main/src/session-widgets/sessionbasewindow.cpp
+--- orig/src/session-widgets/sessionbasewindow.cpp	2026-07-05 09:31:29.938887061 +0000
++++ dde-session-shell-repack-main/src/session-widgets/sessionbasewindow.cpp	2026-07-05 09:33:44.708920729 +0000
+@@ -150,6 +150,8 @@
+     m_centerVLayout->addStretch(1);
+     m_centerVLayout->addSpacerItem(m_centerSpacerItem);
+     m_centerVLayout->addLayout(m_centerLayout);
++    // 认证区域与底部图标栏之间保留固定间距，避免内容紧贴底部边缘
++    m_centerVLayout->addSpacing(AUTH_WIDGET_BOTTOM_SPACING);
+ 
+     m_centerFrame = new QFrame;
+     m_centerFrame->setAccessibleName("CenterFrame");
+diff -ru '--exclude=.git' orig/src/session-widgets/sfa_widget.cpp dde-session-shell-repack-main/src/session-widgets/sfa_widget.cpp
+--- orig/src/session-widgets/sfa_widget.cpp	2026-07-05 09:31:29.938983038 +0000
++++ dde-session-shell-repack-main/src/session-widgets/sfa_widget.cpp	2026-07-05 09:31:45.773862093 +0000
+@@ -77,9 +77,9 @@
+     m_mainLayout->addItem(m_bioBottomSpacingHolder);
+     m_mainLayout->addWidget(m_chooseAuthButtonBox, 0, Qt::AlignCenter);
+     m_mainLayout->addItem(m_authTypeBottomSpacingHolder);
+-    SpacerItemBinder::addWidget(m_userAvatar, m_mainLayout, Qt::AlignVCenter, 5);
+-    SpacerItemBinder::addWidget(m_accountEdit, m_mainLayout, Qt::AlignVCenter, 20);
+-    SpacerItemBinder::addWidget(m_userNameWidget, m_mainLayout, Qt::AlignVCenter, 20);
++    SpacerItemBinder::addWidget(m_userAvatar, m_mainLayout, Qt::AlignVCenter, 4);
++    SpacerItemBinder::addWidget(m_accountEdit, m_mainLayout, Qt::AlignVCenter, 8);
++    SpacerItemBinder::addWidget(m_userNameWidget, m_mainLayout, Qt::AlignVCenter, 8);
+     m_mainLayout->addSpacing(20);
+     m_mainLayout->addWidget(m_expiredStateLabel);
+     m_mainLayout->addSpacing(10);
+diff -ru '--exclude=.git' orig/src/widgets/timewidget.cpp dde-session-shell-repack-main/src/widgets/timewidget.cpp
+--- orig/src/widgets/timewidget.cpp	2026-07-05 09:31:29.950703581 +0000
++++ dde-session-shell-repack-main/src/widgets/timewidget.cpp	2026-07-05 09:32:42.112575595 +0000
+@@ -9,6 +9,10 @@
+ #include <QFontDatabase>
+ #include <QGuiApplication>
+ 
++// 时钟放大倍率：在系统字体大小（T1 档）基础上进一步放大，
++// 使其更接近参考设计中大号时钟的观感。
++static const double CLOCK_SIZE_SCALE = 1.35;
++
+ const QStringList weekdayFormat = {"dddd", "ddd"};
+ const QStringList shortDateFormat = { "yyyy/M/d", "yyyy-M-d", "yyyy.M.d",
+                                       "yyyy/MM/dd", "yyyy-MM-dd", "yyyy.MM.dd",
+@@ -37,6 +41,37 @@
+     return QFont::Bold;
+ }
+ 
++/**
++ * @brief resolveFontFamily 优先跟随系统（控制中心 - 字体）设置的字体家族，
++ * 如果该字体家族在当前系统上不可用，则依次降级到一组常见的备用字体，
++ * 保证任何情况下都不会回退到 Qt 的匿名默认字体。
++ */
++static QString resolveFontFamily()
++{
++    const QString systemFamily = QGuiApplication::font().family();
++    const QStringList installed = QFontDatabase::families();
++
++    if (!systemFamily.isEmpty() && installed.contains(systemFamily, Qt::CaseInsensitive)) {
++        return systemFamily;
++    }
++
++    static const QStringList fallbacks = {
++        QStringLiteral("Noto Sans"),
++        QStringLiteral("Noto Sans CJK SC"),
++        QStringLiteral("DejaVu Sans"),
++        QStringLiteral("Sans Serif")
++    };
++    for (const QString &fallback : fallbacks) {
++        if (installed.contains(fallback, Qt::CaseInsensitive)) {
++            return fallback;
++        }
++    }
++
++    // 都不可用时，返回系统字体家族（哪怕为空，也交由 Qt 自行选择默认字体，
++    // 不会崩溃，只是不保证跟随控制中心设置）。
++    return systemFamily;
++}
++
+ TimeWidget::TimeWidget(QWidget *parent)
+     : QWidget(parent)
+     , m_timeLabel(nullptr)
+@@ -44,26 +79,19 @@
+     , m_refreshTimer(nullptr)
+     , m_use24HourFormat(true)
+ {
+-    // 不再强制指定字体家族，交由系统默认字体渲染，保证跟随系统字体设置
+-    const QString systemFontFamily = QGuiApplication::font().family();
+-    const QFont::Weight heavyWeight = resolveHeavyWeight(systemFontFamily);
+-
+     m_dateLabel = new QLabel;
+     m_dateLabel->setAlignment(Qt::AlignCenter);
+     QPalette palette = m_dateLabel->palette();
+     palette.setColor(QPalette::WindowText, Qt::white);
+     m_dateLabel->setPalette(palette);
+-    // 日期使用半粗体（Semibold/DemiBold）
+-    DFontSizeManager::instance()->bind(m_dateLabel, DFontSizeManager::T6, QFont::DemiBold);
+ 
+     m_timeLabel = new QLabel;
+     m_timeLabel->setAlignment(Qt::AlignCenter);
+     palette = m_timeLabel->palette();
+     palette.setColor(QPalette::WindowText, Qt::white);
+     m_timeLabel->setPalette(palette);
+-    // 时钟使用系统字体的最重字重（Heavy/Black，若系统字体不提供则依次降级）
+-    DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T1, heavyWeight);
+ 
++    applyFonts();
+     refreshTime();
+ 
+     m_refreshTimer = new QTimer(this);
+@@ -80,6 +108,33 @@
+     setLayout(vLayout);
+ 
+     connect(m_refreshTimer, &QTimer::timeout, this, &TimeWidget::refreshTime);
++    // 控制中心「字体」设置变化时（字体家族/字号），实时跟随刷新
++    connect(qGuiApp, &QGuiApplication::fontChanged, this, &TimeWidget::applyFonts);
++}
++
++/**
++ * @brief TimeWidget::applyFonts 应用日期/时钟字体：
++ * - 字体家族跟随控制中心设置（带降级 fallback，见 resolveFontFamily）
++ * - 时钟使用系统字体可用的最重字重，并在 T1 基础上进一步放大（CLOCK_SIZE_SCALE）
++ * - 日期使用 Medium 字重
++ */
++void TimeWidget::applyFonts()
++{
++    const QString fontFamily = resolveFontFamily();
++    const QFont::Weight heavyWeight = resolveHeavyWeight(fontFamily);
++
++    // 日期：Medium 字重
++    DFontSizeManager::instance()->bind(m_dateLabel, DFontSizeManager::T6, QFont::Medium);
++    QFont dateFont = m_dateLabel->font();
++    if (!fontFamily.isEmpty()) dateFont.setFamily(fontFamily);
++    m_dateLabel->setFont(dateFont);
++
++    // 时钟：最重字重 + 放大
++    DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T1, heavyWeight);
++    QFont timeFont = m_timeLabel->font();
++    if (!fontFamily.isEmpty()) timeFont.setFamily(fontFamily);
++    timeFont.setPointSizeF(timeFont.pointSizeF() * CLOCK_SIZE_SCALE);
++    m_timeLabel->setFont(timeFont);
+ }
+ 
+ void TimeWidget::set24HourFormat(bool use24HourFormat)
+diff -ru '--exclude=.git' orig/src/widgets/timewidget.h dde-session-shell-repack-main/src/widgets/timewidget.h
+--- orig/src/widgets/timewidget.h	2026-07-05 09:31:29.950717649 +0000
++++ dde-session-shell-repack-main/src/widgets/timewidget.h	2026-07-05 09:32:08.372654034 +0000
+@@ -34,6 +34,7 @@
+ 
+ private:
+     void refreshTime();
++    void applyFonts();
+ 
+ private:
+     QLabel *m_timeLabel;
+diff -ru '--exclude=.git' orig/src/widgets/user_name_widget.cpp dde-session-shell-repack-main/src/widgets/user_name_widget.cpp
+--- orig/src/widgets/user_name_widget.cpp	2026-07-05 09:31:29.950769581 +0000
++++ dde-session-shell-repack-main/src/widgets/user_name_widget.cpp	2026-07-05 09:31:54.428225169 +0000
+@@ -95,7 +95,7 @@
+         m_displayNameLabel->setTextFormat(Qt::TextFormat::PlainText);
+         m_displayNameLabel->setAlignment(Qt::AlignCenter);
+         m_displayNameLabel->setTextFormat(Qt::TextFormat::PlainText);
+-        DFontSizeManager::instance()->bind(m_displayNameLabel, DFontSizeManager::T2);
++        DFontSizeManager::instance()->bind(m_displayNameLabel, DFontSizeManager::T2, QFont::Bold);
+         palette = m_displayNameLabel->palette();
+         palette.setColor(QPalette::WindowText, Qt::white);
+         m_displayNameLabel->setPalette(palette);
