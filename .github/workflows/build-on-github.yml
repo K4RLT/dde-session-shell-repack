@@ -15,26 +15,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build inside Deepin container
+      - name: Build .deb inside Deepin container
         run: |
           docker run --rm -v "$PWD":/build -w /build debian:bookworm bash -c '
             set -euxo pipefail
             apt-get update
-            apt-get install -y --no-install-recommends ca-certificates gnupg apt-transport-https curl build-essential cmake dpkg-dev git
+            apt-get install -y --no-install-recommends ca-certificates gnupg apt-transport-https curl build-essential cmake dpkg-dev devscripts debhelper git
             rm -f /etc/apt/sources.list.d/debian.sources
             echo "deb [trusted=yes] https://community-packages.deepin.com/beige crimson main" > /etc/apt/sources.list
             apt-get update
+
+            # Build from a subdirectory so dpkg-buildpackage places the
+            # resulting .deb/.changes/.dsc in /build (the mounted volume),
+            # since it defaults to writing them one level above the source tree.
+            mkdir -p /build/pkgroot
+            git archive HEAD | tar -x -C /build/pkgroot
+            cd /build/pkgroot
             apt-get build-dep -y .
-            mkdir -p build && cd build
-            cmake -DCMAKE_BUILD_TYPE=Release ..
-            make -j$(nproc)
-            find . -maxdepth 1 -type f -executable -exec strip --strip-unneeded {} \; || true
+            dpkg-buildpackage -us -uc -b
           '
 
-      - name: Package build output
+      - name: Collect .deb artifacts
         run: |
-          cd build
-          tar -czf ../dde-session-shell-build.tar.gz .
+          mkdir -p deb-output
+          mv ./*.deb deb-output/ 2>/dev/null || true
+          ls -la deb-output
 
       - name: Create beta release
         uses: softprops/action-gh-release@v2
@@ -42,4 +47,4 @@ jobs:
           tag_name: beta-${{ github.run_number }}
           name: Beta build ${{ github.run_number }}
           prerelease: true
-          files: dde-session-shell-build.tar.gz
+          files: deb-output/*.deb

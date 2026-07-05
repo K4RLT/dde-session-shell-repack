@@ -34,6 +34,7 @@ public Q_SLOTS:
 
 private:
     void refreshTime();
+    void applyFonts();
 
 private:
     QLabel *m_timeLabel;

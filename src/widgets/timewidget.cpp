@@ -16,6 +16,29 @@ const QStringList shortDateFormat = { "yyyy/M/d", "yyyy-M-d", "yyyy.M.d",
                                       "yy-M-d", "yy.M.d" };
 const QStringList shortTimeFormat = { "h:mm", "hh:mm"};
 
+// 时钟在原有 T1 字号基础上再放大的倍数
+const double ClockScaleFactor = 1.35;
+// 如果系统字体（控制中心 -> 个性化 -> 字体）不可用时的备用字体链
+const QStringList FontFallbackChain = { QStringLiteral("Noto Sans"), QStringLiteral("DejaVu Sans"), QStringLiteral("Sans Serif") };
+
+/**
+ * @brief resolveFontFamily 优先使用控制中心设置的系统字体，如果该字体未安装
+ * 则依次尝试备用字体链，保证任何环境下都有可用字体。
+ */
+static QString resolveFontFamily()
+{
+    const QString systemFamily = QGuiApplication::font().family();
+    const QStringList installedFamilies = QFontDatabase::families();
+    if (!systemFamily.isEmpty() && installedFamilies.contains(systemFamily))
+        return systemFamily;
+
+    for (const QString &fallback : FontFallbackChain) {
+        if (installedFamilies.contains(fallback))
+            return fallback;
+    }
+    return systemFamily;
+}
+
 /**
  * @brief resolveHeavyWeight 检测系统字体是否提供 Black/Heavy 字重，
  * 如果没有则依次降级到 ExtraBold、Bold，保证在任意系统字体下都有明显的"重"字重效果。
@@ -44,26 +67,19 @@ TimeWidget::TimeWidget(QWidget *parent)
     , m_refreshTimer(nullptr)
     , m_use24HourFormat(true)
 {
-    // 不再强制指定字体家族，交由系统默认字体渲染，保证跟随系统字体设置
-    const QString systemFontFamily = QGuiApplication::font().family();
-    const QFont::Weight heavyWeight = resolveHeavyWeight(systemFontFamily);
-
     m_dateLabel = new QLabel;
     m_dateLabel->setAlignment(Qt::AlignCenter);
     QPalette palette = m_dateLabel->palette();
     palette.setColor(QPalette::WindowText, Qt::white);
     m_dateLabel->setPalette(palette);
-    // 日期使用半粗体（Semibold/DemiBold）
-    DFontSizeManager::instance()->bind(m_dateLabel, DFontSizeManager::T6, QFont::DemiBold);
 
     m_timeLabel = new QLabel;
     m_timeLabel->setAlignment(Qt::AlignCenter);
     palette = m_timeLabel->palette();
     palette.setColor(QPalette::WindowText, Qt::white);
     m_timeLabel->setPalette(palette);
-    // 时钟使用系统字体的最重字重（Heavy/Black，若系统字体不提供则依次降级）
-    DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T1, heavyWeight);
 
+    applyFonts();
     refreshTime();
 
     m_refreshTimer = new QTimer(this);
@@ -94,8 +110,34 @@ void TimeWidget::updateLocale(const QLocale &locale)
     refreshTime();
 }
 
+/**
+ * @brief TimeWidget::applyFonts 应用时钟/日期字体：字体族跟随控制中心系统字体设置
+ * （带备用字体链），时钟使用系统字体的最重字重并放大，日期使用中等（Medium）字重。
+ * 由 refreshTime() 每秒重新调用一次，这样即使系统字体在运行时被修改，也能持续跟随。
+ */
+void TimeWidget::applyFonts()
+{
+    const QString fontFamily = resolveFontFamily();
+    const QFont::Weight heavyWeight = resolveHeavyWeight(fontFamily);
+
+    // 日期：中等字重
+    DFontSizeManager::instance()->bind(m_dateLabel, DFontSizeManager::T6, QFont::Medium);
+    QFont dateFont = m_dateLabel->font();
+    dateFont.setFamily(fontFamily);
+    m_dateLabel->setFont(dateFont);
+
+    // 时钟：系统字体最重字重（Heavy/Black，若不支持则依次降级），并整体放大
+    DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T1, heavyWeight);
+    QFont timeFont = m_timeLabel->font();
+    timeFont.setFamily(fontFamily);
+    timeFont.setPointSizeF(timeFont.pointSizeF() * ClockScaleFactor);
+    m_timeLabel->setFont(timeFont);
+}
+
 void TimeWidget::refreshTime()
 {
+    applyFonts();
+
     if (m_use24HourFormat) {
         m_timeLabel->setText(m_locale.toString(QDateTime::currentDateTime(), shortTimeFormat.at(m_shortTimeIndex)));
     } else {

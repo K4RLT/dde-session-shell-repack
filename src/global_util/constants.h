@@ -26,7 +26,10 @@ static const int BIO_AUTH_STATE_PLACE_HOLDER_HEIGHT = 42; // 生物认证状态�
 static const int CHOOSE_AUTH_TYPE_PLACE_HOLDER_HEIGHT = 36; // 认证类型选择按钮占位高度
 static const int BIO_AUTH_STATE_BOTTOM_SPACING = 30; // 生物识别状态底部间隔
 static const int CHOOSE_AUTH_TYPE_BUTTON_BOTTOM_SPACING = 40; // 认证类型选择按钮底部间隔
-static const double AUTH_WIDGET_TOP_SPACING_PERCENT = 0.35; // 认证窗口顶部间隔占整个屏幕的百分比
+// 注意：中间区域布局现在在此间隔前加了一段可伸缩空间（见 SessionBaseWindow::initUI），
+// 认证控件已经被挤压到底部，此百分比实际决定的是认证控件与底部图标栏之间的间隙大小，
+// 而不再是距离屏幕顶部的距离。数值越小，认证控件越靠近底部。
+static const double AUTH_WIDGET_TOP_SPACING_PERCENT = 0.15; // 认证窗口底部间隔占整个屏幕的百分比
 static const int LAYOUT_BUTTON_HEIGHT =  34;
 static const int KEYBOARD_LAYOUT_WIDTH = 200;
 

@@ -77,9 +77,10 @@ void SFAWidget::initUI()
     m_mainLayout->addItem(m_bioBottomSpacingHolder);
     m_mainLayout->addWidget(m_chooseAuthButtonBox, 0, Qt::AlignCenter);
     m_mainLayout->addItem(m_authTypeBottomSpacingHolder);
-    SpacerItemBinder::addWidget(m_userAvatar, m_mainLayout, Qt::AlignVCenter, 5);
-    SpacerItemBinder::addWidget(m_accountEdit, m_mainLayout, Qt::AlignVCenter, 20);
-    SpacerItemBinder::addWidget(m_userNameWidget, m_mainLayout, Qt::AlignVCenter, 20);
+    // 缩小头像、账户名和用户名控件之间的间距，让整个登录区域看起来更紧凑
+    SpacerItemBinder::addWidget(m_userAvatar, m_mainLayout, Qt::AlignVCenter, 4);
+    SpacerItemBinder::addWidget(m_accountEdit, m_mainLayout, Qt::AlignVCenter, 8);
+    SpacerItemBinder::addWidget(m_userNameWidget, m_mainLayout, Qt::AlignVCenter, 8);
     m_mainLayout->addSpacing(20);
     m_mainLayout->addWidget(m_expiredStateLabel);
     m_mainLayout->addSpacing(10);

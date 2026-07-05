@@ -95,7 +95,7 @@ void UserNameWidget::initialize()
         m_displayNameLabel->setTextFormat(Qt::TextFormat::PlainText);
         m_displayNameLabel->setAlignment(Qt::AlignCenter);
         m_displayNameLabel->setTextFormat(Qt::TextFormat::PlainText);
-        DFontSizeManager::instance()->bind(m_displayNameLabel, DFontSizeManager::T2);
+        DFontSizeManager::instance()->bind(m_displayNameLabel, DFontSizeManager::T2, QFont::Bold);
         palette = m_displayNameLabel->palette();
         palette.setColor(QPalette::WindowText, Qt::white);
         m_displayNameLabel->setPalette(palette);
