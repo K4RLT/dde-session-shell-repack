@@ -17,10 +17,10 @@ jobs:
           docker run --rm -v "$PWD":/build -w /build debian:bookworm bash -c '
             set -euxo pipefail
             apt-get update
-            apt-get install -y --no-install-recommends ca-certificates gnupg apt-transport-https curl build-essential cmake devscripts equivs git
+            apt-get install -y --no-install-recommends ca-certificates gnupg apt-transport-https curl build-essential cmake dpkg-dev git
             echo "deb [trusted=yes] https://community-packages.deepin.com/beige crimson main" > /etc/apt/sources.list.d/deepin.list
             apt-get update
-            mk-build-deps -i -t "apt-get -y --no-install-recommends" debian/control
+            apt-get build-dep -y .
             mkdir -p build && cd build
             cmake ..
             make -j$(nproc)
