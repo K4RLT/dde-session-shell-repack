@@ -29,6 +29,7 @@ jobs:
             # resulting .deb/.changes/.dsc in /build (the mounted volume),
             # since it defaults to writing them one level above the source tree.
             mkdir -p /build/pkgroot
+            git config --global --add safe.directory /build
             git archive HEAD | tar -x -C /build/pkgroot
             cd /build/pkgroot
             apt-get build-dep -y .

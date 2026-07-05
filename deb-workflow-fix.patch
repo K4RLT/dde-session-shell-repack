@@ -1,0 +1,12 @@
+diff --git a/.github/workflows/build-on-github.yml b/.github/workflows/build-on-github.yml
+index c9d6205..f0065b5 100644
+--- a/.github/workflows/build-on-github.yml
++++ b/.github/workflows/build-on-github.yml
+@@ -29,6 +29,7 @@ jobs:
+             # resulting .deb/.changes/.dsc in /build (the mounted volume),
+             # since it defaults to writing them one level above the source tree.
+             mkdir -p /build/pkgroot
++            git config --global --add safe.directory /build
+             git archive HEAD | tar -x -C /build/pkgroot
+             cd /build/pkgroot
+             apt-get build-dep -y .
